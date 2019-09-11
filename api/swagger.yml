@@ -33,6 +33,82 @@ paths:
                   $ref: '#/components/schemas/Domain'
           404:
             description: "Domain no encontrado"
+  /custom-domain/{domain}:
+    delete:
+      operationId: "api.domains.borrar"
+      tags:
+        - "Domains"
+      summary: "Borrar un custom domains de los domains"
+      description: "Borra un custom domain"
+      parameters:
+        - in: path
+          name: domain
+          required: true
+          schema:
+            type: string
+          description: El hostname del custom-domain a borrar
+      responses:
+        200:
+          description: "Ok"
+          content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/OnlyDomain'
+        404:
+          description: "Not Found"
+    put:
+      operationId: "api.domains.modificar"
+      tags:
+        - "Domains"
+      summary: "Modificar un custom domain de los domains"
+      description: "Modifica un custom domain si este existe"
+      parameters:
+        - in: path
+          name: domain
+          required: true
+          schema:
+            type: string
+          description: El hostname del custom-domain a modificar
+      responses:
+        200:
+          description: "Ok"
+          content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Domain'
+        404:
+          description: "Not Found"
+        400:
+          description: "Bad Request"
+  /custom-domain:
+    get:
+      operationId: "api.domains.obtener_todos"
+      tags:
+        - "Domains"
+      summary: "Obtiene todos los custom domains del listado de domains"
+      description: "Obtiene todos los custom domains"
+      responses:
+        200:
+          description: "Ok"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Domain'
+    post:
+      operationId: "api.domains.crear"
+      tags:
+        - "Domains"
+      summary: "Alta de un dominio custom"
+      description: "Crea un nuevo dominio y lo agrega a la lista de custom domains"
+      responses:
+        201:
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Domain'
+        400:
+          description: "custom domain already exists or missing information"
   /alumnos:
     get:
       operationId: "api.alumnos.obtener_todos"
@@ -151,3 +227,8 @@ components:
           type: "string"
         custom:
           type: "boolean"
+    OnlyDomain:
+      type: "object"
+      properties:
+        domain:
+          type: "string"

@@ -1,6 +1,6 @@
 from flask import abort, make_response, jsonify
 import dns.resolver
-from . utils import is_custom
+from . utils import is_custom, dup, ip_round_robin
 
 # Data to serve with our API
 domains = {
@@ -15,6 +15,20 @@ domains = {
         'custom': True,
     },
 }
+
+resolver_domains = {}
+
+def obtener_todos():
+    """
+    Esta funcion maneja el request GET /api/custom-domain
+
+    :return:        200 lista de todos los custom domains creados
+    """
+    # Falta agregar el param opcional del filtro
+    items = []
+    for domain in domains:
+        items.append(domain)
+    return items
 
 def obtener_uno(domain):
     """
@@ -32,7 +46,72 @@ def obtener_uno(domain):
         dns_results = dns.resolver.query(domain)
         dns_records = [ip.address for ip in dns_results]
         response = jsonify( domain=domain,
-                            ip=dns_records[0],
+                            ip=dns_records[0], #ip_round_robin(resolver_domains, domain, dns_records)
                             custom=False)
 
         return make_response(response, 200)
+
+
+def crear(**kwargs):
+    """
+    Esta funcion maneja el request POST /api/custom-domain
+
+    :param body:  custom domain a crear
+    :return: 201 custom domain creado, 400 entidad
+                con el mismo dominio o bad request
+    """
+    domain = kwargs.get('body')
+    hostname = domain.get('domain')
+    ip = domain.get('ip')
+
+    if not ip or not hostname:
+        return abort(400, 'missing information to create a custom domain')
+
+    dup = False
+    for existent_domain in domains:
+        dup = hostname == existent_domain.get('domain')
+        if dup: break
+
+    if dup:
+        return abort(400, 'custom domain already exists')
+
+    domain['id'] = hostname
+    domain['custom'] = True
+
+    return make_response(domain, 201)
+
+def borrar(domain):
+    """
+    Esta funcion maneja el request DELETE /api/custom-domain/{domain}
+
+    :domain body:  hostname que se quiere borrar
+    :return:        200 domain, 404 domain no encontrado
+    """
+    if domain not in domains:
+        return abort(404, 'Not Found')
+
+    deleted_domain = domains.get(domain)
+    response = jsonify(deleted_domain)
+    del domains[domain]
+
+    return make_response(response, 200)
+
+def modificar(**kwargs):
+    """
+    Esta funcion maneja el request DELETE /api/custom-domain/{domain}
+
+    :domain body:  hostname que se quiere borrar
+    :return:        200 domain, 404 domain no encontrado
+    """
+    updated_domain = kwargs.get('body')
+    hostname = updated_domain.get('domain')
+    ip = updated_domain.get('ip')
+
+    if not ip or not hostname:
+        return abort(400, 'payload is invalid')
+
+    if hostname not in domains:
+        return abort(404, 'domain not found')
+
+    domains['ip'] = ip
+    return make_response(updated_domain, 200)
