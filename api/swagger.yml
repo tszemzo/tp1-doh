@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
   version: "1.0.0"
-  title: API de Alumnos
-  description: Documentación de la API de Alumnos de la materia 75.43 Introducción a Sistemas Distribuidos
+  title: API de Domains
+  description: Documentación de la API de Domains de la materia 75.43 Introducción a Sistemas Distribuidos
 
 servers:
   - url: http://localhost:8080/api
@@ -10,6 +10,29 @@ servers:
 
 # Paths servidos por la aplicación
 paths:
+  /domains/{domain}:
+      get:
+        operationId: "api.domains.obtener_uno"
+        tags:
+          - "Domains"
+        summary: "IP del domain provisto"
+        description: "Obtiene un IP particular de un hostname provisto"
+        parameters:
+          - in: path
+            name: domain
+            required: true
+            schema:
+              type: string
+            description: El hostname del domain a obtener
+        responses:
+          200:
+            description: "Ok"
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Domain'
+          404:
+            description: "Domain no encontrado"
   /alumnos:
     get:
       operationId: "api.alumnos.obtener_todos"
@@ -119,3 +142,12 @@ components:
           type: "number"
         mensaje:
           type: "string"
+    Domain:
+      type: "object"
+      properties:
+        domain:
+          type: "string"
+        ip:
+          type: "string"
+        custom:
+          type: "boolean"
