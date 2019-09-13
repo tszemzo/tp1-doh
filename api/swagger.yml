@@ -32,7 +32,7 @@ paths:
                 schema:
                   $ref: '#/components/schemas/Domain'
           404:
-            description: "Domain no encontrado"
+            description: "Not Found"
   /alumnos:
     get:
       operationId: "api.alumnos.obtener_todos"
