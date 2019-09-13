@@ -1,6 +1,6 @@
 from flask import abort, make_response, jsonify, request
 import dns.resolver
-from . utils import is_custom, dup, ip_round_robin, in_domains
+from . utils import dup, ip_round_robin, in_domains
 
 # Data to serve with our API
 domains = {
@@ -39,7 +39,7 @@ def obtener_uno(domain):
     :domain body: hostname del domain que se quiere obtener
     :return:      200 hostname, 404 domain no encontrado
     """
-    if is_custom(domain) and in_domains(domain, domains):
+    if in_domains(domain, domains):
         return domains.get(domain)
     try:
         dns_results = dns.resolver.query(domain)

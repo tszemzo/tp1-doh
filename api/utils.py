@@ -1,6 +1,3 @@
-def is_custom(hostname):
-    return hostname.split('.')[0] == 'custom'
-
 def in_domains(hostname, domains):
 	return hostname in domains
 
