@@ -20,7 +20,7 @@ Una vez que se ejecutan los comandos arriba mencionados, podemos proceder a inic
 
 Una vez iniciado el servidor, podemos navegar a la documentación de la API. Para esto, navegamos en el browser a http://localhost:8080/api/ui.
 Allí podremos encontrar todos los endpoints expuestos por la API.
-Para realizar el primer request, podemos navegar en el browser a http://localhost:8080/api/alumnos.
+Para realizar el primer request, podemos navegar en el browser a http://localhost:8080/api/domains.
 
 ## Resolver de DNS
 Las queries de DNS que requieran contactar un servidor externo deberán ser resueltas usando 
