@@ -52,7 +52,7 @@ def obtener_uno(domain):
 
     except:
         error_msg = jsonify(error='domain not found')
-        return make_response( error_msg , 400)
+        return make_response( error_msg , 404)
         # return abort(404, 'domain not found')
 
 
