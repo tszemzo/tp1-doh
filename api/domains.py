@@ -1,16 +1,16 @@
-from flask import abort, make_response, jsonify
+from flask import abort, make_response, jsonify, request
 import dns.resolver
-from . utils import is_custom, dup, ip_round_robin
+from . utils import is_custom, dup, ip_round_robin, in_domains
 
 # Data to serve with our API
 domains = {
-    'fi.uba.ar': {
-        'domain': 'fi.uba.ar',
+    'custom2.fi.uba.ar': {
+        'domain': 'custom2.fi.uba.ar',
         'ip': '157.92.49.38',
-        'custom': False,
+        'custom': True,
     },
     'custom.fi.uba.ar': {
-        'domain': 'fi.uba.ar',
+        'domain': 'custom.fi.uba.ar',
         'ip': '1.1.1.1',
         'custom': True,
     },
@@ -27,8 +27,10 @@ def obtener_todos():
     # Falta agregar el param opcional del filtro
     items = []
     for domain in domains:
-        items.append(domain)
-    return items
+        items.append(domains[domain])
+
+    response = jsonify(items=items)
+    return make_response(response, 200)
 
 def obtener_uno(domain):
     """
@@ -37,12 +39,9 @@ def obtener_uno(domain):
     :domain body: hostname del domain que se quiere obtener
     :return:      200 hostname, 404 domain no encontrado
     """
-    if domain not in domains:
-        return abort(404, 'domain not found')
-    elif is_custom(domain):
+    if is_custom(domain) and in_domains(domain, domains):
         return domains.get(domain)
-    else:
-        ## Falta agregar el Round Robin
+    try:
         dns_results = dns.resolver.query(domain)
         dns_records = [ip.address for ip in dns_results]
         response = jsonify( domain=domain,
@@ -50,6 +49,11 @@ def obtener_uno(domain):
                             custom=False)
 
         return make_response(response, 200)
+
+    except:
+        error_msg = jsonify(error='domain not found')
+        return make_response( error_msg , 400)
+        # return abort(404, 'domain not found')
 
 
 def crear(**kwargs):
@@ -64,21 +68,15 @@ def crear(**kwargs):
     hostname = domain.get('domain')
     ip = domain.get('ip')
 
-    if not ip or not hostname:
-        return abort(400, 'missing information to create a custom domain')
+    if not ip or not hostname or in_domains(hostname,domains):
+        error_msg = jsonify(error='custom domain already exists')
+        return make_response( error_msg , 400)
+        # return abort(400, 'custom domain already exists')
 
-    dup = False
-    for existent_domain in domains:
-        dup = hostname == existent_domain.get('domain')
-        if dup: break
-
-    if dup:
-        return abort(400, 'custom domain already exists')
-
-    domain['id'] = hostname
-    domain['custom'] = True
-
-    return make_response(domain, 201)
+    else:
+        domain['custom'] = True
+        domains[hostname] = domain
+        return make_response(domain, 201)
 
 def borrar(domain):
     """
@@ -88,30 +86,38 @@ def borrar(domain):
     :return:        200 domain, 404 domain no encontrado
     """
     if domain not in domains:
-        return abort(404, 'Not Found')
+        error_msg = jsonify( error='domain not found' )
+        return make_response(error_msg, 404)
+        # return abort(404, 'domain not found')
 
-    deleted_domain = domains.get(domain)
-    response = jsonify(deleted_domain)
-    del domains[domain]
-
+    domains.pop(domain)
+    response = jsonify( domain=domain )
     return make_response(response, 200)
 
-def modificar(**kwargs):
+def modificar(domain, **kwargs):
     """
     Esta funcion maneja el request DELETE /api/custom-domain/{domain}
 
     :domain body:  hostname que se quiere borrar
     :return:        200 domain, 404 domain no encontrado
     """
+
     updated_domain = kwargs.get('body')
     hostname = updated_domain.get('domain')
     ip = updated_domain.get('ip')
 
     if not ip or not hostname:
-        return abort(400, 'payload is invalid')
+        error_msg = jsonify( error='payload is invalid' )
+        return make_response(error_msg, 400)
+        # return abort(400, 'payload is invalid')
 
-    if hostname not in domains:
-        return abort(404, 'domain not found')
+    elif not in_domains(domain, domains):
+        error_msg = jsonify( error='domain not found' )
+        return make_response(error_msg, 404)
+        # return abort(404, 'domain not found')
 
-    domains['ip'] = ip
-    return make_response(updated_domain, 200)
+    else:
+        # In case it is possible to edit domains name, if not domains.pop flys.
+        domains.pop(domain)
+        domains[hostname] = updated_domain
+        return make_response(updated_domain, 200)

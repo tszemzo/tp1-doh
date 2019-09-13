@@ -1,11 +1,15 @@
 def is_custom(hostname):
     return hostname.split('.')[0] == 'custom'
 
+def in_domains(hostname, domains):
+	return hostname in domains
+
 def dup(new_domain, domains):
 	dup = False
-    for existent_domain in domains:
-        dup = new_domain == existent_domain.get('domain')
-        if dup: return True
+	for existent_domain in domains:
+		dup = new_domain == existent_domain.get('domain')
+		if dup: return True
+	return dup
 
 def ip_round_robin(domains, hostname, ip_list):
 	count_ips = len(ip_list)

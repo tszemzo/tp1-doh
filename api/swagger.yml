@@ -33,6 +33,10 @@ paths:
                   $ref: '#/components/schemas/Domain'
           404:
             description: "Not Found"
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
   /custom-domain/{domain}:
     delete:
       operationId: "api.domains.borrar"
@@ -56,6 +60,10 @@ paths:
                   $ref: '#/components/schemas/OnlyDomain'
         404:
           description: "Not Found"
+          content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
     put:
       operationId: "api.domains.modificar"
       tags:
@@ -69,6 +77,13 @@ paths:
           schema:
             type: string
           description: El hostname del custom-domain a modificar
+      requestBody:
+        required: true
+        x-body-name: 'domain'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InputDomain'
       responses:
         200:
           description: "Ok"
@@ -78,8 +93,16 @@ paths:
                   $ref: '#/components/schemas/Domain'
         404:
           description: "Not Found"
+          content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
         400:
           description: "Bad Request"
+          content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
   /custom-domain:
     get:
       operationId: "api.domains.obtener_todos"
@@ -93,13 +116,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Domain'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Domain'
     post:
       operationId: "api.domains.crear"
       tags:
         - "Domains"
       summary: "Alta de un dominio custom"
       description: "Crea un nuevo dominio y lo agrega a la lista de custom domains"
+      requestBody:
+        required: true
+        x-body-name: 'domain'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InputDomain'
       responses:
         201:
           description: "Created"
@@ -108,117 +140,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Domain'
         400:
-          description: "custom domain already exists or missing information"
+          description: "Bad Request"
+          content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
 
-  /alumnos:
-    get:
-      operationId: "api.alumnos.obtener_todos"
-      tags:
-        - "Alumnos"
-      summary: "Colección de alumnos de la materia"
-      description: "Obtiene la lista de todos los alumnos de la materia existentes en el sistema"
-      responses:
-        200:
-          description: "Operación de lectura exitosa"
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Alumno'
-    post:
-      operationId: "api.alumnos.crear"
-      tags:
-        - "Alumnos"
-      summary: "Alta de un alumno de la materia"
-      description: "Crea un nuevo alumno y lo agrega a la lista de alumnos de la materia"
-      requestBody:
-        required: true
-        x-body-name: 'alumno'
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/InputAlumno'
-      responses:
-        201:
-          description: "Se creo el alumno correctamente"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Alumno'
-        400:
-          description: "DNI o padron duplicado"
-  /alumnos/{id_alumno}:
-    get:
-      operationId: "api.alumnos.obtener_uno"
-      tags:
-        - "Alumnos"
-      summary: "Alumno de la materia"
-      description: "Obtiene un alumno particular de la materia"
-      parameters:
-        - in: path
-          name: id_alumno
-          required: true
-          schema:
-            type: integer
-          description: El id del usuario a obtener
-      responses:
-        200:
-          description: "Operación de lectura exitosa"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Alumno'
-        404:
-          description: "Alumno no encontrado"
-    delete:
-      operationId: "api.alumnos.borrar"
-      tags:
-        - "Alumnos"
-      summary: "Borrar alumno de la materia"
-      description: "Borra un alumno de la materia"
-      parameters:
-        - in: path
-          name: id_alumno
-          required: true
-          schema:
-            type: integer
-          description: El id del usuario a borrar
-      responses:
-        204:
-          description: "Operación de lectura exitosa"
-        404:
-          description: "Alumno no encontrado"
 # Declaración de tipos de datos
 components:
   schemas:
-    Alumno:
-      type: "object"
-      properties:
-        id:
-          type: "number"
-        nombre:
-          type: "string"
-        dni:
-          type: "string"
-        padron:
-          type: "string"
-    InputAlumno:
-      type: "object"
-      properties:
-        nombre:
-          type: "string"
-        dni:
-          type: "string"
-        padron:
-          type: "string"
-    Error:
-      type: "object"
-      properties:
-        codigo:
-          type: "number"
-        mensaje:
-          type: "string"
     Domain:
       type: "object"
       properties:
@@ -228,8 +158,20 @@ components:
           type: "string"
         custom:
           type: "boolean"
+    InputDomain:
+      type: "object"
+      properties:
+        domain:
+          type: "string"
+        ip:
+          type: "string"
     OnlyDomain:
       type: "object"
       properties:
         domain:
+          type: "string"
+    Error:
+      type: "object"
+      properties:
+        error:
           type: "string"
