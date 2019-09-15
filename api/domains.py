@@ -101,7 +101,6 @@ def modificar(domain, **kwargs):
     :domain body:  hostname que se quiere modificar
     :return:       200 domain, 404 domain no encontrado, 400 bad request
     """
-
     updated_domain = kwargs.get('body')
     ip = updated_domain.get('ip')
 
@@ -110,5 +109,5 @@ def modificar(domain, **kwargs):
     elif not in_domains(domain, domains):
         return abort(404, 'domain not found')
     else:
-        domains[domain] = updated_domain
+        domains[domain]['ip'] = ip
         return make_response(updated_domain, 200)
