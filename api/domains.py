@@ -94,30 +94,28 @@ def borrar(domain):
     response = jsonify( domain=domain )
     return make_response(response, 200)
 
+
 def modificar(domain, **kwargs):
     """
-    Esta funcion maneja el request DELETE /api/custom-domain/{domain}
+    Esta funcion maneja el request PUT /api/custom-domain/{domain}
 
-    :domain body:  hostname que se quiere borrar
-    :return:        200 domain, 404 domain no encontrado
+    :domain body:  hostname que se quiere modificar
+    :return:       200 domain, 404 domain no encontrado, 400 bad request
     """
 
     updated_domain = kwargs.get('body')
-    hostname = updated_domain.get('domain')
     ip = updated_domain.get('ip')
 
-    if not ip or not hostname:
-        error_msg = jsonify( error='payload is invalid' )
+    if not ip:
+        error_msg = jsonify(error='payload is invalid')
         return make_response(error_msg, 400)
         # return abort(400, 'payload is invalid')
 
     elif not in_domains(domain, domains):
-        error_msg = jsonify( error='domain not found' )
+        error_msg = jsonify(error='domain not found')
         return make_response(error_msg, 404)
         # return abort(404, 'domain not found')
 
     else:
-        # In case it is possible to edit domains name, if not domains.pop flys.
-        domains.pop(domain)
-        domains[hostname] = updated_domain
+        domains[domain] = updated_domain
         return make_response(updated_domain, 200)

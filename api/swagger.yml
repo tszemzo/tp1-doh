@@ -83,7 +83,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InputDomain'
+              $ref: '#/components/schemas/OnlyIp'
       responses:
         200:
           description: "Ok"
@@ -169,6 +169,11 @@ components:
       type: "object"
       properties:
         domain:
+          type: "string"
+    OnlyIp:
+      type: "object"
+      properties:
+        ip:
           type: "string"
     Error:
       type: "object"
