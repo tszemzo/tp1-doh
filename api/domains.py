@@ -1,6 +1,6 @@
 import dns.resolver
 from flask import abort, make_response, jsonify
-from . utils import in_domains
+from . utils import in_domains, ip_round_robin
 
 # Data to serve with our API
 domains = {
@@ -49,7 +49,9 @@ def obtener_uno(domain):
         dns_results = dns.resolver.query(domain)
         dns_records = [ip.address for ip in dns_results]
         response = jsonify(domain=domain,
-                           ip=dns_records[0],
+                           ip=ip_round_robin(resolver_domains,
+                                             domain,
+                                             dns_records),
                            custom=False)
 
         return make_response(response, 200)
