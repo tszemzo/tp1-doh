@@ -105,6 +105,13 @@ paths:
                   $ref: '#/components/schemas/Error'
   /custom-domains:
     get:
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Filtro para el dominio a buscar
+          required: false
       operationId: "api.domains.obtener_todos"
       tags:
         - "Domains"

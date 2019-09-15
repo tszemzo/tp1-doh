@@ -19,16 +19,17 @@ domains = {
 resolver_domains = {}
 
 
-def obtener_todos():
+def obtener_todos(**kwargs):
     """
     Esta funcion maneja el request GET /api/custom-domain
 
     :return:        200 lista de todos los custom domains creados
     """
-    # Falta agregar el param opcional del filtro
+    query = kwargs.get('q')
     items = []
     for domain in domains:
-        items.append(domains[domain])
+        if query is None or query in domain:
+            items.append(domains[domain])
 
     response = jsonify(items=items)
     return make_response(response, 200)
