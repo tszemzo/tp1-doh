@@ -37,7 +37,7 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/Error'
-  /custom-domain/{domain}:
+  /custom-domains/{domain}:
     delete:
       operationId: "api.domains.borrar"
       tags:
@@ -103,7 +103,7 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/Error'
-  /custom-domain:
+  /custom-domains:
     get:
       operationId: "api.domains.obtener_todos"
       tags:
