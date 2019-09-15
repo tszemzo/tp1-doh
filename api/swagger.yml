@@ -37,7 +37,7 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/Error'
-  /custom-domain/{domain}:
+  /custom-domains/{domain}:
     delete:
       operationId: "api.domains.borrar"
       tags:
@@ -83,7 +83,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InputDomain'
+              $ref: '#/components/schemas/OnlyIp'
       responses:
         200:
           description: "Ok"
@@ -103,8 +103,15 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/Error'
-  /custom-domain:
+  /custom-domains:
     get:
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Filtro para el dominio a buscar
+          required: false
       operationId: "api.domains.obtener_todos"
       tags:
         - "Domains"
@@ -170,8 +177,19 @@ components:
       properties:
         domain:
           type: "string"
+    OnlyIp:
+      type: "object"
+      properties:
+        ip:
+          type: "string"
     Error:
       type: "object"
       properties:
-        error:
+        detail:
+          type: "string"
+        status:
+          type: "integer"
+        title:
+          type: "string"
+        type:
           type: "string"

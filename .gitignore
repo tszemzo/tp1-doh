@@ -1,0 +1,5 @@
+# Virtual env.
+/.venv
+
+# Python bytecode.
+/api/__pycache__/
