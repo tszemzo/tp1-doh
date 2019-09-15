@@ -1,6 +1,6 @@
 import dns.resolver
 from flask import abort, make_response, jsonify
-from . utils import dup, ip_round_robin, in_domains
+from . utils import in_domains
 
 # Data to serve with our API
 domains = {
@@ -43,6 +43,7 @@ def obtener_uno(domain):
     """
     if in_domains(domain, domains):
         return domains.get(domain)
+
     try:
         dns_results = dns.resolver.query(domain)
         dns_records = [ip.address for ip in dns_results]
@@ -52,9 +53,7 @@ def obtener_uno(domain):
 
         return make_response(response, 200)
     except dns.resolver.NXDOMAIN:
-        error_msg = jsonify(error='domain not found')
-        return make_response(error_msg, 404)
-        # return abort(404, 'domain not found')
+        return abort(404, 'domain not found')
 
 
 def crear(**kwargs):
@@ -70,10 +69,7 @@ def crear(**kwargs):
     ip = domain.get('ip')
 
     if not ip or not hostname or in_domains(hostname, domains):
-        error_msg = jsonify(error='custom domain already exists')
-        return make_response(error_msg, 400)
-        # return abort(400, 'custom domain already exists')
-
+        return abort(400, 'custom domain already exists')
     else:
         domain['custom'] = True
         domains[hostname] = domain
@@ -88,9 +84,7 @@ def borrar(domain):
     :return:        200 domain, 404 domain no encontrado
     """
     if domain not in domains:
-        error_msg = jsonify(error='domain not found')
-        return make_response(error_msg, 404)
-        # return abort(404, 'domain not found')
+        return abort(404, 'domain not found')
 
     domains.pop(domain)
     response = jsonify(domain=domain)
@@ -109,15 +103,9 @@ def modificar(domain, **kwargs):
     ip = updated_domain.get('ip')
 
     if not ip:
-        error_msg = jsonify(error='payload is invalid')
-        return make_response(error_msg, 400)
-        # return abort(400, 'payload is invalid')
-
+        return abort(400, 'payload is invalid')
     elif not in_domains(domain, domains):
-        error_msg = jsonify(error='domain not found')
-        return make_response(error_msg, 404)
-        # return abort(404, 'domain not found')
-
+        return abort(404, 'domain not found')
     else:
         domains[domain] = updated_domain
         return make_response(updated_domain, 200)
