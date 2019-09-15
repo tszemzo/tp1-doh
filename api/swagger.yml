@@ -185,5 +185,11 @@ components:
     Error:
       type: "object"
       properties:
-        error:
+        detail:
+          type: "string"
+        status:
+          type: "integer"
+        title:
+          type: "string"
+        type:
           type: "string"
