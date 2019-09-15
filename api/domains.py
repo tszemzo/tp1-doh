@@ -1,5 +1,5 @@
-from flask import abort, make_response, jsonify, request
 import dns.resolver
+from flask import abort, make_response, jsonify
 from . utils import dup, ip_round_robin, in_domains
 
 # Data to serve with our API
@@ -18,6 +18,7 @@ domains = {
 
 resolver_domains = {}
 
+
 def obtener_todos():
     """
     Esta funcion maneja el request GET /api/custom-domain
@@ -32,6 +33,7 @@ def obtener_todos():
     response = jsonify(items=items)
     return make_response(response, 200)
 
+
 def obtener_uno(domain):
     """
     Esta funcion maneja el request GET /api/domains/{domain}
@@ -44,15 +46,14 @@ def obtener_uno(domain):
     try:
         dns_results = dns.resolver.query(domain)
         dns_records = [ip.address for ip in dns_results]
-        response = jsonify( domain=domain,
-                            ip=dns_records[0], #ip_round_robin(resolver_domains, domain, dns_records)
-                            custom=False)
+        response = jsonify(domain=domain,
+                           ip=dns_records[0],
+                           custom=False)
 
         return make_response(response, 200)
-
     except:
         error_msg = jsonify(error='domain not found')
-        return make_response( error_msg , 404)
+        return make_response(error_msg, 404)
         # return abort(404, 'domain not found')
 
 
@@ -68,15 +69,16 @@ def crear(**kwargs):
     hostname = domain.get('domain')
     ip = domain.get('ip')
 
-    if not ip or not hostname or in_domains(hostname,domains):
+    if not ip or not hostname or in_domains(hostname, domains):
         error_msg = jsonify(error='custom domain already exists')
-        return make_response( error_msg , 400)
+        return make_response(error_msg, 400)
         # return abort(400, 'custom domain already exists')
 
     else:
         domain['custom'] = True
         domains[hostname] = domain
         return make_response(domain, 201)
+
 
 def borrar(domain):
     """
@@ -86,12 +88,12 @@ def borrar(domain):
     :return:        200 domain, 404 domain no encontrado
     """
     if domain not in domains:
-        error_msg = jsonify( error='domain not found' )
+        error_msg = jsonify(error='domain not found')
         return make_response(error_msg, 404)
         # return abort(404, 'domain not found')
 
     domains.pop(domain)
-    response = jsonify( domain=domain )
+    response = jsonify(domain=domain)
     return make_response(response, 200)
 
 
