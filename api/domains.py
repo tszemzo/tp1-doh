@@ -51,7 +51,7 @@ def obtener_uno(domain):
                            custom=False)
 
         return make_response(response, 200)
-    except:
+    except dns.resolver.NXDOMAIN:
         error_msg = jsonify(error='domain not found')
         return make_response(error_msg, 404)
         # return abort(404, 'domain not found')
